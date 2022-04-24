@@ -6,8 +6,8 @@ Plex playlists don't allow filtering by watched status so a collection might be 
 
 ## TODO:
 
-- Print missing movies from your library so you can choose to add them.
-- Order playlist entries by rating and not name. Shawshank Redemption should be listed before 12 Angry men...
+- Prevent iterating over entire plex library for each imdb movie (this is done to preserver ordering).
+- Rewrite to use a plex collection instead of a playlist.
 
 
 ## Usage:
