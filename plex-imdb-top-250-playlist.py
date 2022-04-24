@@ -32,24 +32,26 @@ if __name__ == "__main__":
     account = MyPlexAccount(os.environ.get('plex_username'), os.environ.get('plex_password') + mfa_token)
     plex = account.resource(os.environ.get('plex_server')).connect()  # returns a PlexServer instance
     #######################################
-    # creating instance of IMDb
     ia = Cinemagoer()
-    
-    # getting top 250 movies
-    search = ia.get_top250_movies()
-
-    imdbtop250ids = []
-    for imdb250movie in search:
-        imdbtop250ids.append(imdb250movie.movieID)
+    imdb_top_250_movies = ia.get_top250_movies()
     #######################################
-    to_playlist = []
-    movies = plex.library.section(os.environ.get('plex_library'))
-    for movie in movies.searchMovies():
-        for guid in movie.guids:
-            if 'imdb' in guid.id:
-                clean_id = guid.id.replace('imdb://tt','')
-                if clean_id in imdbtop250ids:
-                    #print(movie.title + ' is in the IMDb Top 250 Movies list.')
-                    to_playlist.append(movie)
+    plex_movies = plex.library.section(os.environ.get('plex_library'))
 
-    movies.createPlaylist("IMDb Top 250 Movies", to_playlist)
+    playlist_title = "IMDb Top 250 Movies"
+    #movies.createPlaylist(playlist_title, None)
+    my_playlist = plex.playlist(playlist_title)
+
+    print('Missing: ')
+    plex_movie_search = plex_movies.searchMovies()
+    for imdb_top_250_movie in imdb_top_250_movies:
+        movie_found = False
+        for plex_movie in plex_movie_search:
+            for guid in plex_movie.guids:
+                if 'imdb' in guid.id:
+                    clean_id = guid.id.replace('imdb://tt','')
+                    if clean_id == imdb_top_250_movie.movieID:
+                        my_playlist.addItems(plex_movie)
+                        movie_found = True
+                
+        if movie_found == False:
+            print(imdb_top_250_movie)
